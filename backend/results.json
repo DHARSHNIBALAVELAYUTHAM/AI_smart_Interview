@@ -1,0 +1,119 @@
+[
+    {
+        "candidate_id": "CD08",
+        "name": "A.ABC",
+        "face": "Happy",
+        "voice": "Confident",
+        "score": 0.9,
+        "decision": "Selected",
+        "image": "CD08.png"
+    },
+    {
+        "candidate_id": "CD01",
+        "name": "Dharsh",
+        "face": "No Data",
+        "voice": "No Data",
+        "score": 0.5,
+        "decision": "Pending",
+        "image": "CD01.png"
+    },
+    {
+        "candidate_id": "CD0123",
+        "name": "Dharsh",
+        "face": "Neutral",
+        "voice": "Neutral",
+        "score": 0.62,
+        "decision": "Rejected",
+        "image": "CD0123.png"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Selected"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD00",
+        "name": "B.Dharshni",
+        "face": "Sad",
+        "voice": "Neutral",
+        "score": 0.52,
+        "image": "CD00.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD001",
+        "name": "Dharsh",
+        "face": "Neutral",
+        "voice": "Neutral",
+        "score": 0.7,
+        "image": "CD001.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "82032210400",
+        "name": "Dharshni",
+        "face": "Neutral",
+        "voice": "Neutral",
+        "score": 0.7,
+        "image": "82032210400.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "CD88",
+        "name": "N.DHARA",
+        "face": "Neutral",
+        "voice": "Neutral",
+        "score": 0.7,
+        "image": "CD88.png",
+        "decision": "Pending"
+    },
+    {
+        "candidate_id": "D001",
+        "name": "N.DHARA",
+        "face": "Neutral",
+        "voice": "Neutral",
+        "score": 0.7,
+        "image": "D001.png",
+        "decision": "Pending"
+    }
+]

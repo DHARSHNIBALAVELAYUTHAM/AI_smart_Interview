@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Analysis - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h2>Candidate Result Dashboard</h2>
+        <div>
+            <button class="secondary" style="width: auto; padding: 8px 16px; margin-right: 10px;" onclick="window.location.href='hr.html'">Back to Panel</button>
+            <button class="danger" style="width: auto; padding: 8px 16px; margin: 0;" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="glass-panel dashboard-container" id="dashboard-content" style="display: none;">
+            <div class="dashboard-left">
+                <img id="cand-img" alt="Loading..." style="width: 100%; max-width: 400px; height: 300px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); background: #333;">
+            </div>
+            
+            <div class="dashboard-right">
+                <h2 style="color: #3b82f6; border-bottom: 2px solid rgba(59, 130, 246, 0.5); padding-bottom: 10px; margin-bottom: 20px;">Candidate Details</h2>
+                
+                <div class="info-item">
+                    <span>Candidate ID:</span>
+                    <strong id="cand-id"></strong>
+                </div>
+                <div class="info-item">
+                    <span>Name:</span>
+                    <strong id="cand-name"></strong>
+                </div>
+                <div class="info-item">
+                    <span>Face Emotion:</span>
+                    <strong id="cand-face"></strong>
+                </div>
+                <div class="info-item">
+                    <span>Voice Emotion:</span>
+                    <strong id="cand-voice"></strong>
+                </div>
+                <div class="info-item">
+                    <span>Overall Score:</span>
+                    <strong id="cand-score" style="color: #38bdf8; font-size: 1.2rem;"></strong>
+                </div>
+                <div class="info-item" style="border: none;">
+                    <span>Status:</span>
+                    <span id="cand-status" class="status-badge status-pending"></span>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 15px;">
+                    <button class="success" onclick="updateDecision('Selected')">Select</button>
+                    <button class="danger" onclick="updateDecision('Rejected')">Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-box" class="glass-panel" style="display: none; text-align: center; color: #ef4444; margin-top: 50px;">
+            <h3>Result Not Found</h3>
+            <p>No interview data found for this candidate.</p>
+            <button onclick="window.location.href='hr.html'" style="margin-top: 20px; width: 200px;">Go Back</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:5000";
+        const urlParams = new URLSearchParams(window.location.search);
+        const cid = urlParams.get('cid');
+
+        window.onload = () => {
+            const role = localStorage.getItem('role');
+            if (role !== 'hr') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!cid) {
+                document.getElementById('error-box').style.display = 'block';
+                return;
+            }
+
+            fetchResult();
+        };
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        async function fetchResult() {
+            try {
+                const res = await fetch(`${API_BASE}/result/${cid}`);
+                const data = await res.json();
+
+                console.log("API Response:", data);
+
+                // Check if data has candidate_id or if it's a "not found" message
+                if (data && (data.candidate_id || data.message)) {
+                    if (data.message === "Not found" || data.message === "Error") {
+                        console.log("No data found for candidate:", cid);
+                        document.getElementById('error-box').style.display = 'block';
+                        return;
+                    }
+                    
+                    document.getElementById('dashboard-content').style.display = 'flex';
+                    
+                    document.getElementById('cand-id').innerText = data.candidate_id || 'N/A';
+                    document.getElementById('cand-name').innerText = data.name || 'N/A';
+                    document.getElementById('cand-face').innerText = data.face || 'No Data';
+                    document.getElementById('cand-voice').innerText = data.voice || 'No Data';
+                    document.getElementById('cand-score').innerText = data.score ? (data.score * 100).toFixed(0) + '/100' : 'N/A';
+                    
+                    const imgName = data.image;
+                    const imgEl = document.getElementById('cand-img');
+                    console.log("Image name:", imgName);
+                    
+                    if (imgName) {
+                        const imgPath = `${API_BASE}/images/${imgName}`;
+                        console.log("Loading image from:", imgPath);
+                        imgEl.src = imgPath;
+                    } else {
+                        console.log("No image name in data");
+                    }
+                    
+                    const statusEl = document.getElementById('cand-status');
+                    statusEl.innerText = data.decision || 'Pending';
+                    statusEl.className = 'status-badge';
+                    if (data.decision === 'Selected') statusEl.classList.add('status-selected');
+                    else if (data.decision === 'Rejected') statusEl.classList.add('status-rejected');
+                    else statusEl.classList.add('status-pending');
+
+                } else {
+                    console.log("No data found for candidate:", cid);
+                    document.getElementById('error-box').style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Error fetching result:", err);
+                document.getElementById('error-box').style.display = 'block';
+            }
+        }
+
+        async function updateDecision(decision) {
+            try {
+                console.log("Updating decision:", cid, decision);
+                
+                const res = await fetch(`${API_BASE}/decision`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: cid, decision: decision })
+                });
+
+                const data = await res.json();
+                console.log("Decision response:", data);
+                
+                if (data.success) {
+                    alert(`✅ Candidate ${decision} successfully!`);
+                    // Small delay then refresh
+                    setTimeout(() => {
+                        fetchResult();
+                    }, 500);
+                } else {
+                    alert("Failed to update decision: " + data.message);
+                }
+            } catch (err) {
+                console.error("Update error:", err);
+                alert("Server error while updating decision");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 2rem;
+}
+
+/* Forms and Inputs */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+button.secondary {
+    background: linear-gradient(135deg, #64748b, #475569);
+}
+button.secondary:hover {
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
+}
+
+button.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+button.danger:hover {
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+button.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+button.success:hover {
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Specific Layouts */
+
+/* Login Tabs */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+.tab {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.tab.active {
+    border-bottom: 2px solid #3b82f6;
+    color: #3b82f6;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1000px;
+    width: 90%;
+    margin: 2rem auto;
+}
+
+.dashboard-left, .dashboard-right {
+    flex: 1;
+}
+
+.dashboard-left img {
+    width: 100%;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.status-pending { background: #f59e0b; color: white; }
+.status-selected { background: #10b981; color: white; }
+.status-rejected { background: #ef4444; color: white; }
+
+/* Camera Container */
+.camera-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background: black;
+}
+.camera-container video {
+    width: 100%;
+    display: block;
+}
+
+/* Header */
+.header {
+    width: 100%;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.main-content {
+    margin-top: 80px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1, h2, h3 {
+    margin-bottom: 1rem;
+}

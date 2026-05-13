@@ -1,0 +1,114 @@
+[
+    {
+        "candidate_id": "CD08",
+        "questions": [
+            "1.Tell me about yourself"
+        ]
+    },
+    {
+        "candidate_id": "CD01",
+        "questions": [
+            "1. Explain the difference between Array and Linked List.",
+            "2. What is Object Oriented Programming? Explain its main principles.",
+            "3. What is the difference between SQL and NoSQL databases?",
+            "4. Explain the working of HTTP and HTTPS protocols.",
+            "5. What is a REST API? How does it work?",
+            "6. Tell me about yourself.",
+            "7. Describe a challenging situation you faced and how you handled it.",
+            "8. What are your strengths and weaknesses?",
+            "9. Why do you want to join our company?",
+            "10. Where do you see yourself in 5 years?"
+        ]
+    },
+    {
+        "candidate_id": "CD0123",
+        "questions": [
+            "1. Explain a real-world problem you solved using technology.",
+            "2. What is the difference between synchronous and asynchronous programming?",
+            "3. How do you handle errors in a web application?",
+            "4. Explain any project you have worked on in detail.",
+            "5. What is version control and why is Git important?",
+            "6. Describe a time you worked in a team.",
+            "7. How do you handle pressure or deadlines?",
+            "8. What motivates you to perform better?",
+            "9. How do you deal with failure?",
+            "10. Why should we hire you?"
+        ]
+    },
+    {
+        "candidate_id": "CD012",
+        "questions": [
+            "1. Tell me about yourself.",
+            "2. Describe a challenging situation you faced and how you handled it.",
+            "3. What are your strengths and weaknesses?",
+            "4. Why do you want to join our company?",
+            "5. Where do you see yourself in 5 years?"
+        ]
+    },
+    {
+        "candidate_id": "CD001",
+        "questions": [
+            "1.tell me about yourself",
+            "2.whar is JDK",
+            "3.How do you handle pressure ",
+            "4.why should we hire you",
+            "5.what is your salary expectation"
+        ]
+    },
+    
+    {
+        "candidate_id": "82032210400",
+        "questions": [
+            "1.Tell me about Yourself",
+            "2. Describe a challenging situation you faced and how you handled it.            3. What are your strengths and weaknesses?",
+            "4. Why do you want to join our company?",
+            "5. Where do you see yourself in 5 years?"
+        ]
+    },
+    {
+        "candidate_id": "820322104013",
+        "questions": [
+            "1.Tell me about Yourself.",
+            "2. Describe a challenging situation you faced and how you handled it.            3. What are your strengths and weaknesses?",
+            "4. Why do you want to join our company?",
+            "5. Where do you see yourself in 5 years?"
+        ]
+    },
+    {
+        "candidate_id": "cand1",
+        "questions": [
+            "\"Tell me about yourself\",",
+            "    \"Explain your project\",",
+            "    \"What are your strengths?\",",
+            "    \"How do you handle pressure?\",",
+            "    \"Why should we hire you?\""
+        ]
+    },
+    {
+        "candidate_id": "CD88",
+        "questions": [
+            "1.Tell me about yourself",
+            "2.Explain your project",
+            "3.What are your strengths?",
+            "4.How do you handle pressure?",
+            "5.Why should we hire you?"
+        ]
+    },
+    {
+        "candidate_id": "CD00",
+        "questions": [
+            "1.Tell me about Yourself.",
+            "2.what is JDk?",
+            "3.What is oops concepts?",
+            "4.What are the four pillars of Java?"
+        ]
+    },
+    {
+        "candidate_id": "D001",
+        "questions": [
+            "1. why should i hire you?",
+            "2.explain your project?",
+            "3. what is your weakness?"
+        ]
+    }
+]

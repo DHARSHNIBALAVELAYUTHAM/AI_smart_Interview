@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Analysis - HR Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h2>HR Panel</h2>
+        <div>
+            <span id="user-display" style="margin-right: 20px; font-weight: 600;"></span>
+            <button class="danger" style="width: auto; padding: 8px 16px; margin: 0;" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Notification Banner -->
+    <div id="notification-banner" style="display: none; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 15px; text-align: center; font-weight: bold; animation: pulse 2s infinite;">
+        🔔 New candidate submitted! <a href="#" onclick="refreshResults()" style="color: white; text-decoration: underline;">View Results</a>
+    </div>
+
+    <div class="main-content">
+        <div class="glass-panel" style="width: 500px; max-width: 90%; text-align: center;">
+            <h3 style="margin-bottom: 20px; color: #3b82f6;">Set Interview Questions</h3>
+
+            <input type="text" id="cid" placeholder="Enter Candidate ID" required>
+            <textarea id="questions" placeholder="Enter questions (one per line)" style="width: 100%; height: 150px; padding: 12px; margin: 10px 0; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.2); color: white; border-radius: 8px; outline: none; resize: none;"></textarea>
+
+            <button onclick="saveQuestions()" class="success">Save Questions</button>
+            <p id="status" style="margin-top: 10px; color: #10b981; display: none;"></p>
+
+            <hr style="border: 1px solid rgba(255, 255, 255, 0.1); margin: 20px 0;">
+
+            <h3 style="margin-bottom: 20px; color: #3b82f6;">Search Candidate Result</h3>
+            <input type="text" id="search-cid" placeholder="Enter Candidate ID to view results">
+            <button onclick="goDashboard()">View Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:5000";
+
+        // Auth Check
+        window.onload = () => {
+            const role = localStorage.getItem('role');
+            if (role !== 'hr') {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('user-display').innerText = `HR: ${localStorage.getItem('username')}`;
+            startNotificationCheck();
+        };
+
+        // Notification polling
+        let lastResultCount = 0;
+        
+        function startNotificationCheck() {
+            // Get initial count
+            fetchResults().then(() => {
+                lastResultCount = document.querySelectorAll('.result-card').length;
+            });
+            
+            // Check every 10 seconds for new submissions
+            setInterval(async () => {
+                await checkForNewSubmissions();
+            }, 10000);
+        }
+
+        async function checkForNewSubmissions() {
+            try {
+                const res = await fetch(`${API_BASE}/results`);
+                const data = await res.json();
+                const currentCount = data.results ? data.results.length : 0;
+                
+                if (currentCount > lastResultCount) {
+                    // New submission detected
+                    showNotification();
+                    lastResultCount = currentCount;
+                }
+            } catch (e) {
+                console.log("Notification check failed");
+            }
+        }
+
+        function showNotification() {
+            const banner = document.getElementById('notification-banner');
+            banner.style.display = 'block';
+        }
+
+        function refreshResults() {
+            document.getElementById('notification-banner').style.display = 'none';
+            fetchResults();
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        async function saveQuestions() {
+            const cid = document.getElementById('cid').value.trim();
+            const qText = document.getElementById('questions').value.trim();
+
+            if (!cid || !qText) {
+                alert("Please enter Candidate ID and Questions");
+                return;
+            }
+
+            const questions = qText.split('\n').filter(q => q.trim() !== '');
+
+            try {
+                const res = await fetch(`${API_BASE}/set_questions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: cid, questions: questions })
+                });
+
+                if (res.ok) {
+                    const statusEl = document.getElementById('status');
+                    statusEl.innerText = "Questions saved successfully!";
+                    statusEl.style.display = 'block';
+                    setTimeout(() => statusEl.style.display = 'none', 3000);
+                    document.getElementById('questions').value = '';
+                } else {
+                    alert("Failed to save questions");
+                }
+            } catch (err) {
+                alert("Server error");
+            }
+        }
+
+        function goDashboard() {
+            const searchCid = document.getElementById('search-cid').value.trim() || document.getElementById('cid').value.trim();
+            if (!searchCid) {
+                alert("Please enter a Candidate ID");
+                return;
+            }
+            window.location.href = `dashboard.html?cid=${searchCid}`;
+        }
+    </script>
+</body>
+</html>

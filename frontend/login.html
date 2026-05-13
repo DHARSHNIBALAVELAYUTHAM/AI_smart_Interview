@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Analysis - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-panel" style="width: 400px; max-width: 90%;">
+        <div class="tabs">
+            <div class="tab active" id="tab-login" onclick="switchTab('login')">Login</div>
+            <div class="tab" id="tab-register" onclick="switchTab('register')">Register</div>
+        </div>
+
+        <h2 id="form-title" style="text-align: center; margin-bottom: 20px;">Welcome Back</h2>
+
+        <form id="auth-form" onsubmit="handleAuth(event)">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            
+            <div id="role-container" class="hidden">
+                <select id="role">
+                    <option value="candidate">Candidate</option>
+                    <option value="hr">HR</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submit-btn">Login</button>
+            <p id="error-msg" style="color: #ef4444; margin-top: 10px; text-align: center; display: none;"></p>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:5000";
+        let isLogin = true;
+
+        // Check for role parameter in URL
+        let expectedRole = null;
+        
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roleParam = urlParams.get('role');
+            
+            if (roleParam === 'hr') {
+                expectedRole = 'hr';
+                // HR needs to login, show login tab
+                document.getElementById('role-container').classList.add('hidden');
+            } else if (roleParam === 'candidate') {
+                expectedRole = 'candidate';
+                // Candidate needs to register first, show register tab
+                switchTab('register');
+            }
+        };
+
+        function switchTab(tab) {
+            isLogin = (tab === 'login');
+            
+            document.getElementById('tab-login').classList.toggle('active', isLogin);
+            document.getElementById('tab-register').classList.toggle('active', !isLogin);
+            
+            document.getElementById('form-title').innerText = isLogin ? "Welcome Back" : "Create Account";
+            document.getElementById('submit-btn').innerText = isLogin ? "Login" : "Register";
+            
+            if (isLogin) {
+                document.getElementById('role-container').classList.add('hidden');
+            } else {
+                document.getElementById('role-container').classList.remove('hidden');
+            }
+            
+            document.getElementById('error-msg').style.display = 'none';
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const endpoint = isLogin ? '/login' : '/register';
+            
+            const payload = { username, password };
+            if (!isLogin) payload.role = role;
+            if (isLogin && expectedRole) payload.expected_role = expectedRole;
+
+            try {
+                const res = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    if (isLogin) {
+                        localStorage.setItem('username', username);
+                        localStorage.setItem('role', data.role);
+                        
+                        if (data.role === 'hr') {
+                            window.location.href = 'hr.html';
+                        } else {
+                            window.location.href = 'candidate.html';
+                        }
+                    } else {
+                        alert('Registration successful. Please login.');
+                        switchTab('login');
+                    }
+                } else {
+                    showError(data.message || 'Authentication failed');
+                }
+            } catch (err) {
+                showError('Could not connect to server');
+            }
+        }
+
+        function showError(msg) {
+            const errEl = document.getElementById('error-msg');
+            errEl.innerText = msg;
+            errEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

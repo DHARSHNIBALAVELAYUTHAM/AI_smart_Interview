@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interview - Candidate</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="header">
+    <h2>Candidate Portal</h2>
+    <div>
+        <span id="user-display"></span>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="main-content">
+
+<div class="glass-panel">
+
+<!-- SETUP -->
+<div id="setup-section">
+    <h3>Start Interview</h3>
+    <input type="text" id="cid" placeholder="Candidate ID">
+    <input type="text" id="name" placeholder="Full Name">
+    <button onclick="startInterview()">Start</button>
+</div>
+
+<!-- INTERVIEW -->
+<div id="interview-section" class="hidden">
+
+    <h3 id="question-text">Loading...</h3>
+    
+    <!-- Question Category Badge -->
+    <!-- <div style="margin-bottom: 10px;">
+        <span id="category-badge" style="display: none; padding: 5px 15px; background: rgba(0,230,230,0.2); color: #00e6e6; border-radius: 15px; font-size: 0.9rem;">Technical</span>
+    </div> -->
+
+    <video id="video" autoplay muted></video>
+
+    <!-- Progress Bar -->
+    <!-- <div style="margin: 15px 0;">
+        <div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; overflow: hidden;">
+            <div id="progress-bar" style="background: #00e6e6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <p id="progress-text" style="color: #ccc; font-size: 0.9rem; margin-top: 5px;">Question 1 of 5</p>
+    </div> -->
+
+    <!-- Real-time Emotion Display -->
+    <!-- <div style="display: flex; justify-content: center; gap: 30px; margin: 10px 0;">
+        <div style="text-align: center;">
+            <span style="color: #ccc; font-size: 0.9rem;">Face Emotion</span>
+            <div id="live-face" style="font-size: 1.2rem; color: #00e6e6; font-weight: bold;">Neutral</div>
+        </div>
+        <div style="text-align: center;">
+            <span style="color: #ccc; font-size: 0.9rem;">Voice Emotion</span>
+            <div id="live-voice" style="font-size: 1.2rem; color: #00e6e6; font-weight: bold;">Neutral</div>
+        </div>
+        <div style="text-align: center;">
+            <span style="color: #ccc; font-size: 0.9rem;">Confidence</span>
+            <div id="live-confidence" style="font-size: 1.2rem; color: #00e6e6; font-weight: bold;">--</div>
+        </div>
+    </div> -->
+
+    <div id="timer-display" style="font-size: 1.2rem; color: #38bdf8; margin: 10px 0;">Time: 2:00</div>
+
+    <p id="status">Waiting...</p>
+
+    <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+    <!-- <button id="review-btn" onclick="showReview()" style="display: none; margin-left: 10px;">Review</button> -->
+    <button id="submit-btn" onclick="submitInterview()" style="display: none;">Submit</button>
+
+</div>
+
+<!-- REVIEW SECTION -->
+<!-- <div id="review-section" class="hidden">
+    <h3 style="color: #00e6e6;">Review Your Interview</h3>
+    <div style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+        <p>Questions Answered: <span id="review-questions" style="color: #00e6e6;">0</span></p>
+        <p>Face Emotions Recorded: <span id="review-face" style="color: #00e6e6;">0</span></p>
+        <p>Voice Emotions Recorded: <span id="review-voice" style="color: #00e6e6;">0</span></p>
+    </div>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+        <button onclick="backToInterview()" style="padding: 10px 20px; border-radius: 20px; background: #666; color: white; border: none; cursor: pointer;">Back to Interview</button>
+        <button onclick="submitInterview()" style="padding: 10px 20px; border-radius: 20px; background: #00e6e6; color: black; border: none; cursor: pointer;">Confirm & Submit</button>
+    </div>
+</div> -->
+
+<!-- COMPLETE -->
+<div id="complete-section" class="hidden">
+    <h2>Completed ✅</h2>
+    
+    <!-- Interview Summary -->
+    <!-- <div id="summary-section" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+        <h3 style="color: #00e6e6; margin-bottom: 15px;">Interview Summary</h3>
+        <div style="text-align: left; margin-left: 20px;">
+            <p>Total Questions: <span id="summary-questions" style="color: #00e6e6;">0</span></p>
+            <p>Total Time: <span id="summary-time" style="color: #00e6e6;">0:00</span></p>
+            <p>Average Face Emotion: <span id="summary-face" style="color: #00e6e6;">-</span></p>
+            <p>Average Voice Emotion: <span id="summary-voice" style="color: #00e6e6;">-</span></p>
+        </div>
+    </div> -->
+    
+    <button onclick="logout()">Exit</button>
+</div>
+
+</div>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000";
+
+let questions = [];
+let index = 0;
+
+let mediaRecorder;
+let audioChunks = [];
+
+let faceEmotion = "Neutral";
+let voiceEmotion = "Neutral";
+
+let stream;
+let timerInterval;
+const QUESTION_TIME = 120; // 2 minutes per question
+
+// Tracking variables for summary
+// let questionStartTime = null;
+// let totalInterviewTime = 0;
+// let faceEmotions = [];
+// let voiceEmotions = [];
+// let confidenceScore = 50;
+
+// 🔥 control flow
+let resolveNext;
+
+// ---------------- LOGOUT ----------------
+function logout() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+    }
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    // stopLiveEmotionTracking();
+    localStorage.clear();
+    window.location.href = 'login.html';
+}
+
+// ---------------- START ----------------
+async function startInterview() {
+
+    const cid = document.getElementById("cid").value;
+    const name = document.getElementById("name").value;
+
+    if (!cid || !name) {
+        alert("Enter all fields");
+        return;
+    }
+
+    const res = await fetch(`${API_BASE}/get_questions/${cid}`);
+    const data = await res.json();
+
+    questions = data.questions || [];
+
+    if (questions.length === 0) {
+        alert("No questions assigned");
+        return;
+    }
+
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    video.srcObject = stream;
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    // Collect audio chunks
+    mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    // Start recording and keep it running
+    mediaRecorder.start();
+
+    document.getElementById('setup-section').classList.add('hidden');
+    document.getElementById('interview-section').classList.remove('hidden');
+
+    index = 0;
+    startTimer();
+    // startLiveEmotionTracking();
+    showQuestion();
+}
+
+// ---------------- TIMER ----------------
+function startTimer() {
+    let timeLeft = QUESTION_TIME;
+    
+    if (timerInterval) clearInterval(timerInterval);
+    
+    updateTimerDisplay(timeLeft);
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay(timeLeft);
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            // Auto move to next question when time runs out
+            if (index < questions.length) {
+                nextQuestion();
+            }
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    document.getElementById('timer-display').innerText = 
+        `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// ---------------- SHOW ----------------
+function showQuestion() {
+
+    // Track time for previous question
+    // if (questionStartTime !== null) {
+    //     const timeSpent = QUESTION_TIME - parseInt(document.getElementById('timer-display').innerText.split(':')[1]);
+    //     totalInterviewTime += timeSpent;
+    // }
+    // questionStartTime = Date.now();
+
+    // Detect question category
+    // const currentQuestion = questions[index] || "";
+    // const category = detectCategory(currentQuestion);
+    
+    // // Show category badge
+    // const categoryBadge = document.getElementById('category-badge');
+    // if (categoryBadge) {
+    //     categoryBadge.innerText = category;
+    //     categoryBadge.style.display = 'inline-block';
+    // }
+
+    if (index >= questions.length) {
+
+        document.getElementById("question-text").innerText = "All questions completed!";
+
+        document.getElementById("next-btn").style.display = "none";
+        document.getElementById("submit-btn").style.display = "inline-block";
+        // document.getElementById("review-btn").style.display = "inline-block";
+        document.getElementById("status").innerText = "Ready to submit";
+        document.getElementById('timer-display').innerText = "Time: 0:00";
+        
+        // Update progress bar to 100%
+        // document.getElementById('progress-bar').style.width = '100%';
+        // document.getElementById('progress-text').innerText = `Question ${questions.length} of ${questions.length} (Completed)`;
+
+        return;
+    }
+
+    document.getElementById("question-text").innerText =
+        `Q${index+1}: ${questions[index]}`;
+
+    document.getElementById("status").innerText = "Recording your answer...";
+    document.getElementById("next-btn").disabled = false;
+
+    // Update progress bar
+    // const progress = ((index) / questions.length) * 100;
+    // document.getElementById('progress-bar').style.width = progress + '%';
+    // document.getElementById('progress-text').innerText = `Question ${index + 1} of ${questions.length}`;
+
+    // Reset live emotions for new question
+    // document.getElementById('live-face').innerText = 'Detecting...';
+    // document.getElementById('live-voice').innerText = 'Detecting...';
+
+    // Clear audio chunks for new answer (recorder keeps running)
+    audioChunks = [];
+    
+    // Reset timer for new question
+    startTimer();
+}
+
+// ---------------- NEXT ----------------
+function nextQuestion() {
+
+    if (index >= questions.length) return;
+
+    document.getElementById("status").innerText = "Processing answer...";
+    document.getElementById("next-btn").disabled = true;
+
+    // Process the current answer
+    processAnswer();
+}
+
+// ---------------- PROCESS ----------------
+async function processAnswer() {
+    try {
+        await Promise.all([
+            sendAudio(),
+            captureFace()
+        ]);
+        
+        // Track emotions for summary
+        // faceEmotions.push(faceEmotion);
+        // voiceEmotions.push(voiceEmotion);
+        
+        // Move to next question
+        index++;
+        showQuestion();
+    } catch (err) {
+        console.error("Process error:", err);
+        document.getElementById("status").innerText = "Error processing. Try next.";
+        document.getElementById("next-btn").disabled = false;
+    }
+}
+
+// ---------------- AUDIO ----------------
+function sendAudio() {
+    return new Promise((resolve) => {
+
+        if (audioChunks.length === 0) {
+            resolve();
+            return;
+        }
+
+        const blob = new Blob(audioChunks, { type: "audio/wav" });
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/voice`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ audio: reader.result })
+                });
+
+                const data = await res.json();
+                voiceEmotion = data.emotion || "Neutral";
+
+            } catch {}
+
+            resolve();
+        };
+
+        reader.readAsDataURL(blob);
+    });
+}
+
+// ---------------- FACE ----------------
+async function captureFace() {
+
+    try {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        canvas.getContext("2d").drawImage(video, 0, 0);
+
+        const res = await fetch(`${API_BASE}/face`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ image: canvas.toDataURL() })
+        });
+
+        const data = await res.json();
+        faceEmotion = data.emotion || "Neutral";
+        
+        // Update live face emotion display
+        // document.getElementById('live-face').innerText = faceEmotion;
+
+    } catch {}
+}
+
+// ---------------- LIVE EMOTION TRACKING ----------------
+// let emotionInterval;
+
+// function startLiveEmotionTracking() {
+//     // Update emotions every 3 seconds during interview
+//     emotionInterval = setInterval(async () => {
+//         if (document.getElementById('interview-section').classList.contains('hidden') === false) {
+//             await captureFace();
+//             await sendAudioLive();
+//         }
+//     }, 3000);
+// }
+
+// function stopLiveEmotionTracking() {
+//     if (emotionInterval) {
+//         clearInterval(emotionInterval);
+//     }
+// }
+
+// async function sendAudioLive() {
+//     return new Promise((resolve) => {
+//         if (audioChunks.length === 0) {
+//             resolve();
+//             return;
+//         }
+
+//         const blob = new Blob(audioChunks, { type: "audio/wav" });
+//         const reader = new FileReader();
+
+//         reader.onloadend = async () => {
+//             try {
+//                 const res = await fetch(`${API_BASE}/voice`, {
+//                     method: "POST",
+//                     headers: {"Content-Type": "application/json"},
+//                     body: JSON.stringify({ audio: reader.result })
+//                 });
+
+//                 const data = await res.json();
+//                 voiceEmotion = data.emotion || "Neutral";
+                
+//                 // Update live voice emotion display
+//                 document.getElementById('live-voice').innerText = voiceEmotion;
+                
+//                 // Update confidence display
+//                 if (data.confidence !== undefined) {
+//                     confidenceScore = data.confidence;
+//                     document.getElementById('live-confidence').innerText = data.confidence + '%';
+//                 }
+
+//             } catch {}
+
+//             resolve();
+//         };
+
+//         reader.readAsDataURL(blob);
+//     });
+// }
+
+// ---------------- SUBMIT ----------------
+async function submitInterview() {
+
+    const cid = document.getElementById("cid").value;
+    const name = document.getElementById("name").value;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    const image = canvas.toDataURL("image/png");
+    
+    console.log("Submitting image, size:", image.length);
+
+    try {
+        const res = await fetch(`${API_BASE}/submit`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                candidate_id: cid,
+                name: name,
+                face_emotion: faceEmotion,
+                voice_emotion: voiceEmotion,
+                image: image
+            })
+        });
+
+        const data = await res.json();
+        console.log("Submit response:", data);
+        
+        alert("✅ Interview submitted successfully!");
+        
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        // stopLiveEmotionTracking();
+        
+        // Show completion section
+        document.getElementById('interview-section').classList.add('hidden');
+        document.getElementById('complete-section').classList.remove('hidden');
+        
+        // Display interview summary
+        // displaySummary();
+    } catch (err) {
+        console.error("Submit error:", err);
+        alert("Error submitting interview");
+    }
+}
+
+
+</script>
+
+</body>
+</html> 
+
+
